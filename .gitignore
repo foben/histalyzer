@@ -1,2 +1,4 @@
+*.pyc
 output.txt
 output
+all_100000.txt
