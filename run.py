@@ -9,8 +9,8 @@ from histogram import *
 
 def main():
     #data_dict = parse_sorted(sys.argv[1])
-    #data_dict = parse_selected(sys.argv[1], frames=range(0,331,5))
-    data_dict = parse_selected(sys.argv[1], frames=EVERY_15TH)
+    data_dict = parse_selected(sys.argv[1], frames=range(0,331,5))
+    #data_dict = parse_selected(sys.argv[1], frames=EVERY_15TH)
     category = sys.argv[2]
     added_results = float(0.0)
     number_instances = 0
