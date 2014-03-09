@@ -4,10 +4,12 @@ import sys
 import operator
 import random
 import nearest_neighbor as nn
+from defs import *
 from histogram import *
 
 def main():
-    data_dict = parse_sorted(sys.argv[1])
+    #data_dict = parse_sorted(sys.argv[1])
+    data_dict = parse_selected(sys.argv[1], frames=range(0,331,5))
     category = sys.argv[2]
 
     for instance, testdata in data_dict[category].iteritems():

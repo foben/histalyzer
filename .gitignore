@@ -1,6 +1,7 @@
 *.pyc
 *.swp
 *.csv
+*.txt
 output.txt
 output
 all_100000.txt
