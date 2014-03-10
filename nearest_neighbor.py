@@ -22,17 +22,43 @@ def nearest_neighbor(training_data, testing_data, neighbors=3):
     for test in testing_data:
         running_count += 1
         slist = sorted( training_data, key=lambda tr: diff_sum(test, tr) )
-        categories = {}
+
+        ##NEW approach
+        sorted_categories = []
         for n in range(neighbors):
-            neighbor = slist[n]
-            cat = neighbor.category
-            if cat in categories:
-                categories[cat] += 1
-            else:
-                categories[cat] = 1
-        sorted_categories = sorted(categories.iteritems(), key=operator.itemgetter(1), reverse=True)
-        print sorted_categories
-        assigned_cat = sorted_categories[0][0]
+            exists = False
+            cat = slist[n].category
+            for i in range(len(sorted_categories)):
+                if sorted_categories[i][0] == cat:
+                    exists = True
+                    sorted_categories[i][1] += 1
+            if not exists:
+                sorted_categories.append([cat, 1])
+
+        maxn = 0
+        maxcat = ''
+        for i in range(len(sorted_categories)):
+            if sorted_categories[i][1] > maxn:
+                maxn = sorted_categories[i][1]
+                maxcat = sorted_categories[i][0]
+        assigned_cat = maxcat 
+        #print '%s      --> %s' % (sorted_categories, assigned_cat)
+        ######################################
+
+        ##OLD approach
+        #categories = {}
+        #for n in range(neighbors):
+        #    neighbor = slist[n]
+        #    cat = neighbor.category
+        #    if cat in categories:
+        #        categories[cat] += 1
+        #    else:
+        #        categories[cat] = 1
+        #sorted_categories = sorted(categories.iteritems(), key=operator.itemgetter(1), reverse=True)
+        #print sorted_categories
+        #assigned_cat = sorted_categories[0][0]
+        #######################################
+
         actual_cat = test.category
         marker = ""
         if (assigned_cat == actual_cat):
@@ -40,7 +66,8 @@ def nearest_neighbor(training_data, testing_data, neighbors=3):
         else:
             failure_count += 1
         #print_line(assigned_cat, actual_cat)
-        calc_remaining_time(start_time, total_count, running_count)
+        if running_count % 25 == 0:
+            calc_remaining_time(start_time, total_count, running_count)
     correct_percentage = float(correct_count)/ total_count * 100
     return correct_percentage
 
