@@ -30,7 +30,9 @@ def nearest_neighbor(training_data, testing_data, neighbors=3):
                 categories[cat] += 1
             else:
                 categories[cat] = 1
-        assigned_cat = sorted(categories.iteritems(), key=operator.itemgetter(1), reverse=True)[0][0]
+        sorted_categories = sorted(categories.iteritems(), key=operator.itemgetter(1), reverse=True)
+        print sorted_categories
+        assigned_cat = sorted_categories[0][0]
         actual_cat = test.category
         marker = ""
         if (assigned_cat == actual_cat):
