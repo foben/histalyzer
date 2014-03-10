@@ -28,7 +28,7 @@ def main():
 
     average = added_results / number_instances
     f = open("category_%s.csv" % category, "a")
-    f.write('%s total ,%s\n' % (category, average))
+    f.write('%s average ,%s\n' % (category, average))
     f.close()
 
 def get_training_data(test_data, data_dict):
