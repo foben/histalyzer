@@ -2,6 +2,7 @@
 *.swp
 *.csv
 *.txt
+*.sh
 output.txt
 output
 all_100000.txt
