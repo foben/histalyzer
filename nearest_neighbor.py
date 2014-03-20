@@ -42,23 +42,6 @@ def nearest_neighbor(training_data, testing_data, neighbors=3):
                 maxn = sorted_categories[i][1]
                 maxcat = sorted_categories[i][0]
         assigned_cat = maxcat 
-        #print '%s      --> %s' % (sorted_categories, assigned_cat)
-        ######################################
-
-        ##OLD approach
-        #categories = {}
-        #for n in range(neighbors):
-        #    neighbor = slist[n]
-        #    cat = neighbor.category
-        #    if cat in categories:
-        #        categories[cat] += 1
-        #    else:
-        #        categories[cat] = 1
-        #sorted_categories = sorted(categories.iteritems(), key=operator.itemgetter(1), reverse=True)
-        #print sorted_categories
-        #assigned_cat = sorted_categories[0][0]
-        #######################################
-
         actual_cat = test.category
         marker = ""
         if (assigned_cat == actual_cat):
@@ -68,8 +51,9 @@ def nearest_neighbor(training_data, testing_data, neighbors=3):
         #print_line(assigned_cat, actual_cat)
         if running_count % 25 == 0:
             calc_remaining_time(start_time, total_count, running_count)
+
     correct_percentage = float(correct_count)/ total_count * 100
-    return correct_percentage
+    return correct_percentage, total_count, correct_count
 
 def calc_remaining_time(start, total, current):
     percentage = float(current) / total
