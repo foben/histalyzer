@@ -21,7 +21,7 @@ def nearest_neighbor(training_data, testing_data, neighbors=3):
     start_time = time.clock()
     for test in testing_data:
         running_count += 1
-        slist = sorted( training_data, key=lambda tr: diff_sum(test, tr) )
+        slist = sorted( training_data, key=lambda tr: test.get_distance(tr) )
 
         ##NEW approach
         sorted_categories = []
@@ -63,11 +63,8 @@ def calc_remaining_time(start, total, current):
     print remaining
     return remaining
 
-
-
 def print_line(assigned_cat, actual_cat):
     msg = "Assigned %s, was %s" % (assigned_cat, actual_cat)
     msg = msg.ljust(40, ' ')
     msg = "%s  %s" % (msg, "✓ " if assigned_cat == actual_cat else " ✗")
     print msg
-

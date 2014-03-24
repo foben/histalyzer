@@ -6,22 +6,24 @@ import operator
 import random
 import nearest_neighbor as nn
 import defs
+import util
 from histogram import *
 
 def main():
     #PARAMETER SETUP:
     neighbors = 5
     frameset = defs.EVERY_5TH_FRAME
-    inputfile = sys.argv[1]
-    metric = os.path.basename(inputfile.split('_')[0])
+    category = sys.argv[1]
+    inputfiles = sys.argv[2:]
+    data_dict = util.parse_files(inputfiles, frames=frameset[0])
 
-    #data_dict = parse_sorted(sys.argv[1])
-    data_dict = parse_selected(inputfile, frames=frameset[0])
-    category = sys.argv[2]
+    all_data = [ data_dict[c][i][v][f] \
+            for c in data_dict.keys() \
+            for i in data_dict[c].keys() \
+            for v in data_dict[c][i].keys() \
+            for f in data_dict[c][i][v].keys() ]
 
-    dirstring = "%s_%snn" % (metric, neighbors)
-    print dirstring
-    #CREATE FOLDER/FILES:
+    dirstring = "%s_nn" % neighbors
     if not os.path.exists(dirstring):
         os.makedirs(dirstring)
        
@@ -31,10 +33,15 @@ def main():
     total_tested = 0
     total_correct = 0
 
-    for instance, testdata in data_dict[category].iteritems():
+    for instance in data_dict[category]:
+        i = instance
+        c = category
+        testdata = [ data_dict[c][i][v][f] \
+                for v in data_dict[c][i].keys() \
+                for f in data_dict[c][i][v].keys() ]
+
+        traindata = list(set(all_data) - set(testdata))
         number_instances += 1
-        traindata = get_training_data(testdata, data_dict)
-        print 'Testing category "%s", instance %s' % (category, instance)
         result, tests, corrects = nn.nearest_neighbor(traindata, testdata, neighbors)
         added_results += result
         total_tested += tests
@@ -49,14 +56,5 @@ def main():
     f.write('%s average_mean,%s\n' % (category, average_mean))
     f.write('%s average,%s\n' % (category, average_aggregated))
     f.close()
-
-def get_training_data(test_data, data_dict):
-    training = []
-    for category, instancelist in data_dict.iteritems():
-        for li in instancelist:
-            training.extend(instancelist[li])
-    training = list(set(training) - set(test_data))
-    return training
-
 
 main()
