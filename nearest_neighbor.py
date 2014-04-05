@@ -16,7 +16,7 @@ def nearest_neighbor(training_data, testing_data, neighbors=3):
 
     for hist in testing_data:
         testing_categories.add(hist.category)
-    print "%s different categories in test data." % len(testing_categories)
+    assert (len(testing_categories) == 1), "Different Categories in testing data!"
 
     start_time = time.clock()
     for test in testing_data:
@@ -50,7 +50,8 @@ def nearest_neighbor(training_data, testing_data, neighbors=3):
             failure_count += 1
         #print_line(assigned_cat, actual_cat)
         if running_count % 25 == 0:
-            calc_remaining_time(start_time, total_count, running_count)
+            remaining = calc_remaining_time(start_time, total_count, running_count)
+            print "ETA %s %s: %s" % (test.category, test.instance, remaining)
 
     correct_percentage = float(correct_count)/ total_count * 100
     return correct_percentage, total_count, correct_count
@@ -60,7 +61,6 @@ def calc_remaining_time(start, total, current):
     ptime = time.clock() - start
     rtime = ptime / percentage * (1-percentage)
     remaining = datetime.timedelta(seconds=int(rtime) )
-    print remaining
     return remaining
 
 def print_line(assigned_cat, actual_cat):
