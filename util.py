@@ -6,18 +6,16 @@ def split_histogram_line(line):
     fields      = line.split(':')
     metric      = fields[0]
     htype       = fields[1]
-    sample_size = fields[2]
-    name        = fields[3].split('.')[0]
-    data_string = fields[4]
+    name        = fields[2]
+    data_string = fields[3]
     #Split from the right, allowing for underscore in category
-    name_fields = name.rsplit('_', 3)
+    name_fields = name.split('_')
     category    = name_fields[0]
     instance    = name_fields[1]
     view        = name_fields[2]
     frame       = name_fields[3]
-    hist = Histogram(htype, data_string, sample_size)
+    hist = Histogram(htype, data_string)
     return metric, category, int(instance), int(view), int(frame), hist
-
 
 def parse_files(file_list, categories="all", instances="all",
         views="all", frames="all" ):
@@ -51,8 +49,8 @@ def parse_files(file_list, categories="all", instances="all",
                 'Must be a list of ints: %s' % frames
 
     individuals = {}
-    all_histograms = []
     for filename in file_list:
+        print "Parsing '%s'" % filename
         f = open(filename)
         contents = f.read().splitlines()
         for line in contents:
@@ -73,6 +71,4 @@ def parse_files(file_list, categories="all", instances="all",
                 individuals[category][instance][view][frame] = newinst
             individuals[category][instance][view][frame].add_histogram(metric, hist)
 
-    #print len(individuals['apple'][1][1])
     return individuals
-

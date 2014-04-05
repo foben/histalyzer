@@ -15,13 +15,13 @@ def main():
     frameset = defs.EVERY_5TH_FRAME
     category = sys.argv[1]
     inputfiles = sys.argv[2:]
-    data_dict = util.parse_files(inputfiles, frames=frameset[0])
+    all_individuals = util.parse_files(inputfiles, frames=frameset[0])
 
-    all_data = [ data_dict[c][i][v][f] \
-            for c in data_dict.keys() \
-            for i in data_dict[c].keys() \
-            for v in data_dict[c][i].keys() \
-            for f in data_dict[c][i][v].keys() ]
+    all_data = [ all_individuals[c][i][v][f] \
+            for c in all_individuals.keys() \
+            for i in all_individuals[c].keys() \
+            for v in all_individuals[c][i].keys() \
+            for f in all_individuals[c][i][v].keys() ]
 
     dirstring = "%s_nn" % neighbors
     if not os.path.exists(dirstring):
@@ -33,12 +33,12 @@ def main():
     total_tested = 0
     total_correct = 0
 
-    for instance in data_dict[category]:
+    for instance in all_individuals[category]:
         i = instance
         c = category
-        testdata = [ data_dict[c][i][v][f] \
-                for v in data_dict[c][i].keys() \
-                for f in data_dict[c][i][v].keys() ]
+        testdata = [ all_individuals[c][i][v][f] \
+                for v in all_individuals[c][i].keys() \
+                for f in all_individuals[c][i][v].keys() ]
 
         traindata = list(set(all_data) - set(testdata))
         number_instances += 1
