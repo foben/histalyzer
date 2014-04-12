@@ -23,9 +23,20 @@ def main():
             for v in all_individuals[c][i].keys() \
             for f in all_individuals[c][i][v].keys() ]
 
-    dirstring = "%s_nn" % neighbors
+
+    topdir = frameset[1]
+    metricdir = "a3"
+    nndir = "%s_nn" % neighbors
+
+    dirstring = '/'.join([topdir, metricdir, nndir]) 
+    avgfile = dirstring + '/averages.csv'
+    dirstring += '/raw'
     if not os.path.exists(dirstring):
         os.makedirs(dirstring)
+
+    f = open(avgfile, 'w+')
+    f.write('category,%s_%s_%s\n' % (nndir, metricdir, topdir))
+    f.close()
        
     #RESULT VARIABLES:
     added_results = float(0.0)
