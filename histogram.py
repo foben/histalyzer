@@ -15,6 +15,7 @@ def diff_sum_pair((hist1, hist2)):
     return diff_sum(hist1, hist2)
 
 def diff_sum(hist1, hist2):
+    #Zum Performance Test auskommentieren
     if (not (hist1.bins == hist2.bins) ):
         raise ValueError('Histograms are of different bin-sizes!')
     if (not (hist1.htype == hist2.htype) ):
@@ -23,5 +24,6 @@ def diff_sum(hist1, hist2):
     distance = 0.0
     for b in range(bins):
         distance += math.fabs(hist1.data[b] - hist2.data[b])
+        #Performance Test: Quadratische Distanzmass!
     return distance
 
