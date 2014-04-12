@@ -12,7 +12,7 @@ from histogram import *
 def main():
     #PARAMETER SETUP:
     neighbors = 5
-    frameset = defs.EVERY_5TH_FRAME
+    frameset = defs.EVERY_5TH_FRAME_1OFF
     category = sys.argv[1]
     inputfiles = sys.argv[2:]
     all_individuals = util.parse_files(inputfiles, frames=frameset[0])

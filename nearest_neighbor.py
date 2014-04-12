@@ -13,10 +13,15 @@ def nearest_neighbor(training_data, testing_data, neighbors=3):
     correct_count = 0
 
     testing_categories = set()
+    testing_instances = set()
 
     for hist in testing_data:
         testing_categories.add(hist.category)
+        testing_instances.add(hist.instance)
     assert (len(testing_categories) == 1), "Different Categories in testing data!"
+    assert (len(testing_instances) == 1), "Different Instances in testing data!"
+    print "=== %s %s ===" % (list(testing_categories)[0], list(testing_instances)[0])
+
 
     start_time = time.clock()
     for test in testing_data:
