@@ -12,7 +12,7 @@ from histogram import *
 def main():
     #PARAMETER SETUP:
     neighbors = 5
-    frameset = defs.EVERY_5TH_FRAME_1OFF
+    frameset = defs.EVERY_5TH
     category = sys.argv[1]
     inputfiles = sys.argv[2:]
     all_individuals = util.parse_files(inputfiles, frames=frameset[0])
@@ -25,8 +25,8 @@ def main():
 
 
     topdir = frameset[1]
-    metricdir = "a3"
-    nndir = "%s_nn" % neighbors
+    metricdir = "ccol"
+    nndir = "%snn" % neighbors
 
     dirstring = '/'.join([topdir, metricdir, nndir]) 
     avgfile = dirstring + '/averages.csv'
