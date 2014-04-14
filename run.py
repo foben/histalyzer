@@ -35,8 +35,19 @@ def main():
     parser.add_argument('--wdepth', type=int, default=1)
     parser.add_argument('categories', nargs='+')
     parsed =  parser.parse_args()
-    if len(parsed.categories) == 1 and parsed.categories[0] == 'all':
-        categories = defs.ALL_CATEGORIES
+    if len(parsed.categories) == 1:
+        if parsed.categories[0] == 'all':
+            categories = defs.ALL_CATEGORIES
+        elif parsed.categories[0] == 'run1':
+            categories = defs.RUN1
+        elif parsed.categories[0] == 'run2':
+            categories = defs.RUN2
+        elif parsed.categories[0] == 'run3':
+            categories = defs.RUN3
+        elif parsed.categories[0] == 'run4':
+            categories = defs.RUN4
+        else:
+            categories = parsed.categories
     else:
         categories = parsed.categories
     weight_color = parsed.wcolor
