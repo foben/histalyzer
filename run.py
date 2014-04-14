@@ -35,7 +35,10 @@ def main():
     parser.add_argument('--wdepth', type=int, default=1)
     parser.add_argument('categories', nargs='+')
     parsed =  parser.parse_args()
-    categories = parsed.categories
+    if len(parsed.categories) == 1 and parsed.categories[0] == 'all':
+        categories = defs.ALL_CATEGORIES
+    else:
+        categories = parsed.categories
     weight_color = parsed.wcolor
     weights_color = []
     weight_depth = parsed.wdepth
