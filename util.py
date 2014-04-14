@@ -17,8 +17,28 @@ def split_histogram_line(line):
     hist = Histogram(htype, data_string)
     return metric, category, int(instance), int(view), int(frame), hist
 
-def parse_files(file_list, categories="all", instances="all",
-        views="all", frames="all" ):
+def parse_filelist(file_list, categories="all", instances="all",
+        views="all", frames="all", weights=None, dictionary=None ):
+    if not dictionary:
+        individuals = {}
+    else:
+        individuals = dictionary
+
+    for filename in file_list:
+        individuals = parse_file(filename, categories="all", instances="all",
+            views="all", frames="all", weights=weights, dictionary=individuals)
+    return individuals
+
+
+
+
+def parse_file(filename, categories="all", instances="all",
+        views="all", frames="all", weights=None, dictionary=None ):
+    if not dictionary:
+        individuals = {}
+    else:
+        individuals = dictionary
+
     check_categories = not categories == 'all'
     check_instances = not instances == 'all'
     check_views = not views == 'all'
@@ -48,27 +68,25 @@ def parse_files(file_list, categories="all", instances="all",
         assert all(isinstance(n, int) for n in frames),\
                 'Must be a list of ints: %s' % frames
 
-    individuals = {}
-    for filename in file_list:
-        print "Parsing '%s'" % filename
-        f = open(filename)
-        contents = f.read().splitlines()
-        for line in contents:
-            metric, category, instance, view, frame, hist = split_histogram_line(line)
-            if check_categories and not category in categories: continue
-            if check_instances and not instance in instances: continue 
-            if check_views and not view in views: continue
-            if check_frames and not frame in frames: continue
+    print "Parsing '%s'" % filename
+    f = open(filename)
+    contents = f.read().splitlines()
+    for line in contents:
+        metric, category, instance, view, frame, hist = split_histogram_line(line)
+        if check_categories and not category in categories: continue
+        if check_instances and not instance in instances: continue 
+        if check_views and not view in views: continue
+        if check_frames and not frame in frames: continue
 
-            if not category in individuals:
-                individuals[category] = dict()
-            if not instance in individuals[category]:
-                individuals[category][instance] = dict()
-            if not view in individuals[category][instance]:
-                individuals[category][instance][view] = dict()
-            if not frame in individuals[category][instance][view]:
-                newinst = Individual(category, instance, view, frame)
-                individuals[category][instance][view][frame] = newinst
-            individuals[category][instance][view][frame].add_histogram(metric, hist)
+        if not category in individuals:
+            individuals[category] = dict()
+        if not instance in individuals[category]:
+            individuals[category][instance] = dict()
+        if not view in individuals[category][instance]:
+            individuals[category][instance][view] = dict()
+        if not frame in individuals[category][instance][view]:
+            newinst = Individual(category, instance, view, frame, weights)
+            individuals[category][instance][view][frame] = newinst
+        individuals[category][instance][view][frame].add_histogram(metric, hist)
 
     return individuals
