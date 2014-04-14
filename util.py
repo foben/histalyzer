@@ -1,4 +1,5 @@
 import histogram
+import logging
 from histogram import Histogram
 from individual import Individual
 
@@ -68,7 +69,7 @@ def parse_file(filename, categories="all", instances="all",
         assert all(isinstance(n, int) for n in frames),\
                 'Must be a list of ints: %s' % frames
 
-    print "Parsing '%s'" % filename
+    logging.info("Parsing '%s'", filename)
     f = open(filename)
     contents = f.read().splitlines()
     for line in contents:

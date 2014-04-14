@@ -4,6 +4,7 @@ import sys
 import operator
 import time
 import datetime
+import logging
 from histogram import *
 
 def nearest_neighbor(training_data, testing_data, neighbors=3):
@@ -20,7 +21,7 @@ def nearest_neighbor(training_data, testing_data, neighbors=3):
         testing_instances.add(hist.instance)
     assert (len(testing_categories) == 1), "Different Categories in testing data!"
     assert (len(testing_instances) == 1), "Different Instances in testing data!"
-    print "=== %s %s ===" % (list(testing_categories)[0], list(testing_instances)[0])
+    logging.info("=== %s %s ===", list(testing_categories)[0], list(testing_instances)[0])
 
 
     start_time = time.clock()
@@ -56,7 +57,7 @@ def nearest_neighbor(training_data, testing_data, neighbors=3):
         #print_line(assigned_cat, actual_cat)
         if running_count % 25 == 0:
             remaining = calc_remaining_time(start_time, total_count, running_count)
-            print "ETA %s %s: %s" % (test.category, test.instance, remaining)
+            logging.info("ETA %s %s: %s", test.category, test.instance, remaining)
 
     correct_percentage = float(correct_count)/ total_count * 100
     return correct_percentage, total_count, correct_count
