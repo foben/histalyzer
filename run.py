@@ -11,23 +11,6 @@ import util
 import argparse
 from histogram import *
 
-def parse_data(weight_dict, metrics, frameset=None):
-    if not frameset:
-        frames="all"
-    else:
-        frames=frameset[0]
-    script_dir = os.path.dirname(os.path.realpath(__file__))
-    data_dir = script_dir + '/data'
-    individuals = {}
-    for data_file in os.listdir(data_dir):
-        if not data_file in metrics:
-            logging.info("Skipping %s", data_file)
-            continue
-        data_file = data_dir + '/' + data_file
-        individuals = util.parse_file(data_file, frames=frames,
-                weights=weight_dict, dictionary=individuals)
-    return individuals
-
 def main():
     #ARGUMENT PARSING:
     known_metrics = ['da3', 'cr64', 'cg64', 'dd3', 'cb64', 'ccol', 'dd2']
@@ -39,6 +22,7 @@ def main():
     parser.add_argument('--wcolor', type=int, default=1)
     parser.add_argument('--wdepth', type=int, default=1)
     parser.add_argument('--quiet', action='store_true')
+    parser.add_argument('--debug', action='store_true')
     parser.add_argument('--no_files', action='store_true')
     parser.add_argument('--print_total', action='store_true')
     parser.add_argument('categories', nargs='+')
@@ -46,8 +30,11 @@ def main():
     SET_NOFILES = parsed.no_files
     SET_PRINTTOTAL = parsed.print_total
     SET_QUIET = parsed.quiet
+    SET_DEBUG = parsed.debug
     if SET_QUIET:
         logging.basicConfig(level=logging.WARN)
+    elif SET_DEBUG:
+        logging.basicConfig(level=logging.DEBUG)
     else:
         logging.basicConfig(level=logging.INFO)
     if len(parsed.categories) == 1:
@@ -92,79 +79,106 @@ def main():
     weight_dict['depth'] = ( weight_depth , weights_depth )
 
     #PARAMETER SETUP:
-    ######!!!!!!!!!!!!!!!!!!
-    frameset = defs.EVERY_5TH
-    #frameset = defs.EVERY_200TH
-    category = categories[0]
-    all_individuals = parse_data(weight_dict, used_metrics, frameset=frameset)
-    all_frames = parse_data(weight_dict, used_metrics)
-
-    all_data = [ all_individuals[c][i][v][f] \
-            for c in all_individuals.keys() \
-            for i in all_individuals[c].keys() \
-            for v in all_individuals[c][i].keys() \
-            for f in all_individuals[c][i][v].keys() ]
+    frameset = defs.EVERY_300TH
+    selected_individuals = parse_data(weight_dict, used_metrics, frameset=frameset)
+    all_individuals = parse_data(weight_dict, used_metrics)
 
     if not SET_NOFILES:
-        topdir = frameset[1]
-        metricdir = reduce(lambda x, y: x+'_'+y, used_metrics)
-        nndir = "%snn" % neighbors
-
-        dirstring = '/'.join([topdir, metricdir, nndir]) 
-        avgfile = dirstring + '/averages.csv'
-        dirstring += '/raw'
-        if not os.path.exists(dirstring):
-            os.makedirs(dirstring)
-
-        f = open(avgfile, 'w+')
-        f.write('category,%s_%s_%s\n' % (nndir, metricdir, topdir))
-        f.close()
+        dir_raw, file_avg = create_directory_structure(frameset, used_metrics, neighbors)
 
     #OVERALL VARIABLES:
     overall_tested = 0
     overall_correct = 0
 
     for category in categories:
-        #CATEGORY/INSTANCE VARIABLES:
-        added_results = float(0.0)
-        number_instances = 0
-        total_tested = 0
-        total_correct = 0
+        #CATEGORY VARIABLES:
+        category_tested = 0
+        category_correct = 0
 
-        for instance in all_individuals[category]:
+        for instance in selected_individuals[category]:
             i = instance
             c = category
-            #testdata = [ all_individuals[c][i][v][f] \
-            #        for v in all_individuals[c][i].keys() \
-            #        for f in all_individuals[c][i][v].keys() ]
-            testdata = [ all_frames[c][i][v][f] \
-                    for v in all_frames[c][i].keys() \
-                    for f in all_frames[c][i][v].keys() ]
 
-            traindata = list(set(all_data) - set(testdata))
-            number_instances += 1
-            result, tests, corrects = nn.nearest_neighbor(traindata, testdata, neighbors)
-            added_results += result
-            total_tested += tests
-            overall_tested += tests
-            total_correct += corrects
-            overall_correct += corrects
+            #Use only selected frames from instance to test:
+            #testdata = [ selected_individuals[c][i][v][f] \
+            #        for v in selected_individuals[c][i].keys() \
+            #        for f in selected_individuals[c][i][v].keys() ]
+
+            #Use all frames from instance to test:
+            testdata = [ all_individuals[c][i][v][f] \
+                    for v in all_individuals[c][i].keys() \
+                    for f in all_individuals[c][i][v].keys() ]
+
+            traindata = [ selected_individuals[cat][ins][viw][fr] \
+                for cat in selected_individuals.keys() \
+                for ins in selected_individuals[cat].keys() \
+                    if cat != c or (cat == c and ins !=i)
+                for viw in selected_individuals[cat][ins].keys() \
+                for fr in selected_individuals[cat][ins][viw].keys() ]
+
+            logging.debug("trainlen: %s", len(traindata))
+            logging.debug("testlen : %s", len(testdata))
+            result, instance_tested, instance_correct = nn.nearest_neighbor(traindata, testdata, neighbors)
+            logging.debug("tested  : %s", instance_tested)
+            logging.debug("instance_correct: %s", instance_correct)
+            logging.debug("result  : %s", result)
+
+            category_tested += instance_tested
+            overall_tested += instance_tested
+            category_correct += instance_correct
+            overall_correct += instance_correct
             if not SET_NOFILES:
-                f = open("%s/category_%s.csv" % (dirstring, category), "a")
+                f = open("%s/category_%s.csv" % (dir_raw, category), "a")
                 f.write('%s %s,%s\n' % (category, instance, result))
                 f.close()
 
-        average_mean = added_results / number_instances
-        average_aggregated = float(total_correct) / total_tested * 100
+        average_aggregated = float(category_correct) / category_tested * 100
         if not SET_NOFILES:
-            f = open("%s/category_%s.csv" % (dirstring, category), "a")
-            f.write('%s average_mean,%s\n' % (category, average_mean))
+            f = open("%s/category_%s.csv"% (dir_raw, category), "a")
             f.write('%s average,%s\n' % (category, average_aggregated))
             f.close()
+
     overall_percentage = float(overall_correct)/overall_tested * 100
     logging.info("Overall %% %f", overall_percentage)
+    if not SET_NOFILES:
+        f = open(file_avg, "a")
+        f.write('Overall,%s' % overall_percentage)
+        f.close()
+
     if SET_PRINTTOTAL:
         print "%f" %  overall_percentage
 
+def parse_data(weight_dict, metrics, frameset=None):
+    if not frameset:
+        frames="all"
+    else:
+        frames=frameset[0]
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+    data_dir = script_dir + '/data'
+    individuals = {}
+    for data_file in os.listdir(data_dir):
+        if not data_file in metrics:
+            logging.info("Skipping %s", data_file)
+            continue
+        data_file = data_dir + '/' + data_file
+        individuals = util.parse_file(data_file, frames=frames,
+                weights=weight_dict, dictionary=individuals)
+    return individuals
+
+def create_directory_structure(frameset, used_metrics, neighbors):
+    topdir = frameset[1]
+    metricdir = reduce(lambda x, y: x+'_'+y, used_metrics)
+    nndir = "%snn" % neighbors
+
+    dirstring = '/'.join([topdir, metricdir, nndir]) 
+    avgfile = dirstring + '/averages.csv'
+    dirstring += '/raw'
+    if not os.path.exists(dirstring):
+        os.makedirs(dirstring)
+
+    f = open(avgfile, 'w+')
+    f.write('category,%s_%s_%s\n' % (nndir, metricdir, topdir))
+    f.close()
+    return dirstring, avgfile
 
 main()

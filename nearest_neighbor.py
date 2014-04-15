@@ -52,8 +52,10 @@ def nearest_neighbor(training_data, testing_data, neighbors=3):
         marker = ""
         if (assigned_cat == actual_cat):
             correct_count += 1
+            #print "%s, %s, %s, %s, yes" % (test.category, test.instance, test.view, test.frame )
         else:
             failure_count += 1
+            #print "%s, %s, %s, %s, no" % (test.category, test.instance, test.view, test.frame )
         #print_line(assigned_cat, actual_cat)
         if running_count % 25 == 0:
             remaining = calc_remaining_time(start_time, total_count, running_count)
