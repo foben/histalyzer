@@ -11,7 +11,11 @@ import util
 import argparse
 from histogram import *
 
-def parse_data(frameset, weight_dict, metrics):
+def parse_data(weight_dict, metrics, frameset=None):
+    if not frameset:
+        frames="all"
+    else:
+        frames=frameset[0]
     script_dir = os.path.dirname(os.path.realpath(__file__))
     data_dir = script_dir + '/data'
     individuals = {}
@@ -20,7 +24,7 @@ def parse_data(frameset, weight_dict, metrics):
             logging.info("Skipping %s", data_file)
             continue
         data_file = data_dir + '/' + data_file
-        individuals = util.parse_file(data_file, frames=frameset[0],
+        individuals = util.parse_file(data_file, frames=frames,
                 weights=weight_dict, dictionary=individuals)
     return individuals
 
@@ -89,10 +93,11 @@ def main():
 
     #PARAMETER SETUP:
     ######!!!!!!!!!!!!!!!!!!
-    #frameset = defs.EVERY_5TH
-    frameset = defs.EVERY_200TH
+    frameset = defs.EVERY_5TH
+    #frameset = defs.EVERY_200TH
     category = categories[0]
-    all_individuals = parse_data(frameset, weight_dict, used_metrics)
+    all_individuals = parse_data(weight_dict, used_metrics, frameset=frameset)
+    all_frames = parse_data(weight_dict, used_metrics)
 
     all_data = [ all_individuals[c][i][v][f] \
             for c in all_individuals.keys() \
@@ -129,9 +134,12 @@ def main():
         for instance in all_individuals[category]:
             i = instance
             c = category
-            testdata = [ all_individuals[c][i][v][f] \
-                    for v in all_individuals[c][i].keys() \
-                    for f in all_individuals[c][i][v].keys() ]
+            #testdata = [ all_individuals[c][i][v][f] \
+            #        for v in all_individuals[c][i].keys() \
+            #        for f in all_individuals[c][i][v].keys() ]
+            testdata = [ all_frames[c][i][v][f] \
+                    for v in all_frames[c][i].keys() \
+                    for f in all_frames[c][i][v].keys() ]
 
             traindata = list(set(all_data) - set(testdata))
             number_instances += 1
