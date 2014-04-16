@@ -167,17 +167,15 @@ def parse_data(weight_dict, metrics, frameset=None):
 
 def create_directory_structure(frameset, used_metrics, neighbors, weights_color=None, weights_depth=None):
     topdir = frameset[1]
-    #if weights_color and weights_depth:
     la_weightsdir = lambda st, (m, w): st + '%s-%s_' % (w, m)
     metricdir = ''
     metricdir = reduce(la_weightsdir, weights_depth, metricdir)
     metricdir = reduce(la_weightsdir, weights_color, metricdir)
     metricdir = metricdir[0:-1]
-    #else:
-    #    metricdir = reduce(lambda x, y: x+'_'+y, used_metrics)
     nndir = "%snn" % neighbors
 
-    dirstring = '/'.join([topdir, metricdir, nndir]) 
+    dirstring = '_'.join([topdir, nndir]) 
+    dirstring = '/'.join([dirstring, metricdir])
     avgfile = dirstring + '/averages.csv'
     dirstring += '/raw'
     if not os.path.exists(dirstring):
