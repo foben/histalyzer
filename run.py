@@ -79,12 +79,12 @@ def main():
     weight_dict['depth'] = ( weight_depth , weights_depth )
 
     #PARAMETER SETUP:
-    frameset = defs.EVERY_300TH
+    frameset = defs.EVERY_5TH
     selected_individuals = parse_data(weight_dict, used_metrics, frameset=frameset)
     all_individuals = parse_data(weight_dict, used_metrics)
 
     if not SET_NOFILES:
-        dir_raw, file_avg = create_directory_structure(frameset, used_metrics, neighbors)
+        dir_raw, file_avg = create_directory_structure(frameset, used_metrics, neighbors, weights_color=weights_color, weights_depth=weights_depth)
 
     #OVERALL VARIABLES:
     overall_tested = 0
@@ -140,10 +140,10 @@ def main():
 
     overall_percentage = float(overall_correct)/overall_tested * 100
     logging.info("Overall %% %f", overall_percentage)
-    if not SET_NOFILES:
-        f = open(file_avg, "a")
-        f.write('Overall,%s' % overall_percentage)
-        f.close()
+    #if not SET_NOFILES:
+    #    f = open(file_avg, "a")
+    #    f.write('Overall,%s' % overall_percentage)
+    #    f.close()
 
     if SET_PRINTTOTAL:
         print "%f" %  overall_percentage
@@ -165,9 +165,16 @@ def parse_data(weight_dict, metrics, frameset=None):
                 weights=weight_dict, dictionary=individuals)
     return individuals
 
-def create_directory_structure(frameset, used_metrics, neighbors):
+def create_directory_structure(frameset, used_metrics, neighbors, weights_color=None, weights_depth=None):
     topdir = frameset[1]
-    metricdir = reduce(lambda x, y: x+'_'+y, used_metrics)
+    #if weights_color and weights_depth:
+    la_weightsdir = lambda st, (m, w): st + '%s-%s_' % (w, m)
+    metricdir = ''
+    metricdir = reduce(la_weightsdir, weights_depth, metricdir)
+    metricdir = reduce(la_weightsdir, weights_color, metricdir)
+    metricdir = metricdir[0:-1]
+    #else:
+    #    metricdir = reduce(lambda x, y: x+'_'+y, used_metrics)
     nndir = "%snn" % neighbors
 
     dirstring = '/'.join([topdir, metricdir, nndir]) 
