@@ -54,8 +54,10 @@ def main():
             categories = defs.RUN34
         else:
             categories = parsed.categories
+        categories_string = parsed.categories[0]
     else:
         categories = parsed.categories
+        categories_string = '_'.join(categories)
     weight_color = parsed.wcolor
     weights_color = []
     weight_depth = parsed.wdepth
@@ -83,7 +85,8 @@ def main():
     weight_dict['depth'] = ( weight_depth , weights_depth )
 
     #PARAMETER SETUP:
-    frameset = defs.EVERY_5TH
+    #frameset = defs.EVERY_5TH
+    frameset = defs.EVERY_200TH
     selected_individuals = parse_data(weight_dict, used_metrics, frameset=frameset)
     all_individuals = parse_data(weight_dict, used_metrics)
 
@@ -144,10 +147,10 @@ def main():
 
     overall_percentage = float(overall_correct)/overall_tested * 100
     logging.info("Overall %% %f", overall_percentage)
-    #if not SET_NOFILES:
-    #    f = open(file_avg, "a")
-    #    f.write('Overall,%s' % overall_percentage)
-    #    f.close()
+    if not SET_NOFILES:
+        f = open(file_avg, "a")
+        f.write('overall_%s,%s,%s\n' % (categories_string, overall_tested, overall_correct))
+        f.close()
 
     if SET_PRINTTOTAL:
         print "%f" %  overall_percentage
