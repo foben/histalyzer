@@ -48,6 +48,10 @@ def main():
             categories = defs.RUN3
         elif parsed.categories[0] == 'run4':
             categories = defs.RUN4
+        elif parsed.categories[0] == 'run12':
+            categories = defs.RUN12
+        elif parsed.categories[0] == 'run34':
+            categories = defs.RUN34
         else:
             categories = parsed.categories
     else:
