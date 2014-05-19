@@ -86,7 +86,7 @@ def main():
 
     #PARAMETER SETUP:
     #frameset = defs.EVERY_5TH
-    frameset = defs.EVERY_200TH
+    frameset = defs.EVERY_25TH
     selected_individuals = parse_data(weight_dict, used_metrics, frameset=frameset)
     all_individuals = parse_data(weight_dict, used_metrics)
 
@@ -105,11 +105,6 @@ def main():
         for instance in selected_individuals[category]:
             i = instance
             c = category
-
-            #Use only selected frames from instance to test:
-            #testdata = [ selected_individuals[c][i][v][f] \
-            #        for v in selected_individuals[c][i].keys() \
-            #        for f in selected_individuals[c][i][v].keys() ]
 
             #Use all frames from instance to test:
             testdata = [ all_individuals[c][i][v][f] \
@@ -188,7 +183,7 @@ def create_directory_structure(frameset, used_metrics, neighbors, weights_color=
     if not os.path.exists(dirstring):
         os.makedirs(dirstring)
 
-    f = open(avgfile, 'w+')
+    f = open(avgfile, 'a')
     f.write('category,%s_%s_%s\n' % (nndir, metricdir, topdir))
     f.close()
     return dirstring, avgfile

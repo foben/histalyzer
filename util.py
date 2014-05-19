@@ -30,9 +30,6 @@ def parse_filelist(file_list, categories="all", instances="all",
             views="all", frames="all", weights=weights, dictionary=individuals)
     return individuals
 
-
-
-
 def parse_file(filename, categories="all", instances="all",
         views="all", frames="all", weights=None, dictionary=None ):
     if not dictionary:
