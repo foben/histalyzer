@@ -87,7 +87,6 @@ def main():
     #PARAMETER SETUP:
     #frameset = defs.EVERY_5TH
     frameset = defs.EVERY_25TH
-    selected_individuals = parse_data(weight_dict, used_metrics, frameset=frameset)
     all_individuals = parse_data(weight_dict, used_metrics)
 
     if not SET_NOFILES:
@@ -102,21 +101,8 @@ def main():
         category_tested = 0
         category_correct = 0
 
-        for instance in selected_individuals[category]:
-            i = instance
-            c = category
-
-            #Use all frames from instance to test:
-            testdata = [ all_individuals[c][i][v][f] \
-                    for v in all_individuals[c][i].keys() \
-                    for f in all_individuals[c][i][v].keys() ]
-
-            traindata = [ selected_individuals[cat][ins][viw][fr] \
-                for cat in selected_individuals.keys() \
-                for ins in selected_individuals[cat].keys() \
-                    if cat != c or (cat == c and ins !=i)
-                for viw in selected_individuals[cat][ins].keys() \
-                for fr in selected_individuals[cat][ins][viw].keys() ]
+        for instance in all_individuals[category]:
+            traindata, testdata = util.get_datasets(category, instance, all_individuals, frameset[0])
 
             logging.debug("trainlen: %s", len(traindata))
             logging.debug("testlen : %s", len(testdata))

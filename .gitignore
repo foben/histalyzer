@@ -3,3 +3,8 @@
 *.csv
 data
 learner.sh
+other
+venv
+dist
+*egg-info
+MANIFEST

@@ -88,3 +88,31 @@ def parse_file(filename, categories="all", instances="all",
         individuals[category][instance][view][frame].add_histogram(metric, hist)
 
     return individuals
+
+
+def get_datasets(for_category, for_instance, input_data, tr_frames=None):
+    all_frames_for_training = True if not tr_frames else False
+    #Use all instances, views and frames for testing:
+    testdata = [ input_data[for_category][for_instance][v][f] \
+            for v in input_data[for_category][for_instance].keys() \
+            for f in input_data[for_category][for_instance][v].keys() ]
+
+    traindata = [ input_data[c][i][v][f] \
+        for c in input_data.keys() \
+        for i in input_data[c].keys() \
+            if (c != for_category or (c == for_category and i != for_instance))
+        for v in input_data[c][i].keys() \
+        for f in input_data[c][i][v].keys()
+            if (all_frames_for_training or f in tr_frames)]
+    return traindata, testdata
+
+
+
+
+
+
+
+
+
+
+
