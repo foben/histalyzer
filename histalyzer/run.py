@@ -10,10 +10,11 @@ import defs
 import util
 import argparse
 from histogram import *
+from knnclassifier import KNNClassifier
 
 def main():
     #ARGUMENT PARSING:
-    known_metrics = ['da3', 'cr64', 'cg64', 'dd3', 'cb64', 'ccol', 'dd2']
+    known_metrics = ['da3', 'cr64', 'cg64', 'dd3', 'cb64', 'ccol', 'dd2', 'dd2_64']
     used_metrics = []
     parser = argparse.ArgumentParser(prog='Histalyzer')
     for m in known_metrics:
@@ -95,6 +96,8 @@ def main():
     #OVERALL VARIABLES:
     overall_tested = 0
     overall_correct = 0
+    
+    classifier = KNNClassifier(neighbors, defs.ALL_CATEGORIES)
 
     for category in categories:
         #CATEGORY VARIABLES:
@@ -103,14 +106,8 @@ def main():
 
         for instance in all_individuals[category]:
             traindata, testdata = util.get_datasets(category, instance, all_individuals, frameset[0])
-
-            logging.debug("trainlen: %s", len(traindata))
-            logging.debug("testlen : %s", len(testdata))
-            result, instance_tested, instance_correct = nn.nearest_neighbor(traindata, testdata, neighbors)
-            logging.debug("tested  : %s", instance_tested)
-            logging.debug("instance_correct: %s", instance_correct)
-            logging.debug("result  : %s", result)
-
+            #result, instance_tested, instance_correct = nn.nearest_neighbor(traindata, testdata, neighbors)
+            result, instance_tested, instance_correct = classifier.perform_classification(traindata, testdata)
             category_tested += instance_tested
             overall_tested += instance_tested
             category_correct += instance_correct
@@ -125,6 +122,7 @@ def main():
             f = open("%s/category_%s.csv"% (dir_raw, category), "a")
             f.write('%s average,%s\n' % (category, average_aggregated))
             f.close()
+    classifier.print_confusion_matrix()
 
     overall_percentage = float(overall_correct)/overall_tested * 100
     logging.info("Overall %% %f", overall_percentage)
@@ -136,11 +134,7 @@ def main():
     if SET_PRINTTOTAL:
         print "%f" %  overall_percentage
 
-def parse_data(weight_dict, metrics, frameset=None):
-    if not frameset:
-        frames="all"
-    else:
-        frames=frameset[0]
+def parse_data(weight_dict, metrics):
     script_dir = os.path.dirname(os.path.realpath(__file__))
     data_dir = script_dir + '/data'
     individuals = {}
@@ -149,7 +143,7 @@ def parse_data(weight_dict, metrics, frameset=None):
             logging.info("Skipping %s", data_file)
             continue
         data_file = data_dir + '/' + data_file
-        individuals = util.parse_file(data_file, frames=frames,
+        individuals = util.parse_file(data_file,
                 weights=weight_dict, dictionary=individuals)
     return individuals
 

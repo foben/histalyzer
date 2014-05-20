@@ -47,7 +47,7 @@ class Individual:
 
     def __eq__(self, obj):
         if not isinstance(obj, Individual):
-            return false
+            return False
         if self.category != obj.category:
             return False
         if self.instance != obj.instance:
