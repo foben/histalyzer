@@ -9,7 +9,6 @@ def split_histogram_line(line):
     htype       = fields[1]
     name        = fields[2]
     data_string = fields[3]
-    #Split from the right, allowing for underscore in category
     name_fields = name.split('_')
     category    = name_fields[0]
     instance    = name_fields[1]
@@ -18,20 +17,8 @@ def split_histogram_line(line):
     hist = Histogram(htype, data_string)
     return metric, category, int(instance), int(view), int(frame), hist
 
-def parse_filelist(file_list, categories="all", instances="all",
-        views="all", frames="all", weights=None, dictionary=None ):
-    if not dictionary:
-        individuals = {}
-    else:
-        individuals = dictionary
-
-    for filename in file_list:
-        individuals = parse_file(filename, categories="all", instances="all",
-            views="all", frames="all", weights=weights, dictionary=individuals)
-    return individuals
-
 def parse_file(filename, categories="all", instances="all",
-        views="all", frames="all", weights=None, dictionary=None ):
+        views="all", frames="all", dictionary=None ):
     if not dictionary:
         individuals = {}
     else:
@@ -83,7 +70,7 @@ def parse_file(filename, categories="all", instances="all",
         if not view in individuals[category][instance]:
             individuals[category][instance][view] = dict()
         if not frame in individuals[category][instance][view]:
-            newinst = Individual(category, instance, view, frame, weights)
+            newinst = Individual(category, instance, view, frame)
             individuals[category][instance][view][frame] = newinst
         individuals[category][instance][view][frame].add_histogram(metric, hist)
 
@@ -97,6 +84,8 @@ def get_datasets(for_category, for_instance, input_data, tr_frames=None):
             for v in input_data[for_category][for_instance].keys() \
             for f in input_data[for_category][for_instance][v].keys() ]
 
+    #Use only chosen frames for training.
+    #Discard any frames from the instance to test.
     traindata = [ input_data[c][i][v][f] \
         for c in input_data.keys() \
         for i in input_data[c].keys() \
@@ -105,14 +94,3 @@ def get_datasets(for_category, for_instance, input_data, tr_frames=None):
         for f in input_data[c][i][v].keys()
             if (all_frames_for_training or f in tr_frames)]
     return traindata, testdata
-
-
-
-
-
-
-
-
-
-
-

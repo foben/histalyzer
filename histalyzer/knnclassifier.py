@@ -10,17 +10,60 @@ from collections import Counter, OrderedDict
 
 class KNNClassifier:
 
-    def __init__(self, k=5, classes=None):
+    def __init__(self, weights, k=5, classes=None):
         self.k = k
-    
         self.confusion_matrix = OrderedDict([ (actual,
             OrderedDict([ (predicted,0) for predicted in classes] ))
             for actual in classes ])
+        self.cweight = weights['color'][0]
+        self.dweight = weights['depth'][0]
 
-        self.confusion_matrix['water-bottle']['water-bottle'] += 1
+        lsum = lambda s, (m, w): s + w
+        if self.cweight:
+            self.color_weights = weights['color'][1]
+            self.sum_color_weights = reduce(lsum, self.color_weights, 0)
+        if self.dweight:
+            self.depth_weights = weights['depth'][1]
+            self.sum_depth_weights = reduce(lsum, self.depth_weights, 0)
+        self.sum_weights = self.cweight + self.dweight
+
+        assert (self.cweight > 0 or self.dweight > 0)
+
+        lweight = lambda s, (m, w): s + w*histogram.diff_sum(self.histograms[m],
+                other_instance.histograms[m])
+
+        if self.cweight > 0 and self.dweight > 0:
+            def compute(train, test):
+                coldiff = reduce(lambda s, (m,w): s +
+                        diff_sum(train.histograms[m], test.histograms[m])*w,
+                        self.color_weights, 0
+                        ) * self.cweight
+
+                depdiff = reduce(lambda s, (m,w): s +
+                        diff_sum(train.histograms[m], test.histograms[m])*w,
+                        self.depth_weights, 0
+                        ) * self.dweight
+                return (coldiff + depdiff) / self.sum_weights
+        elif self.cweight > 0 and self.dweight == 0:
+            def compute(train, test):
+                coldiff = reduce(lambda s, (m,w): s +
+                        diff_sum(train.histograms[m], test.histograms[m])*w,
+                        self.color_weights, 0
+                        )
+                return coldiff
+        elif self.cweight == 0 and self.dweight > 0:
+            def compute(train, test):
+                depdiff = reduce(lambda s, (m,w): s +
+                        diff_sum(train.histograms[m], test.histograms[m])*w,
+                        self.depth_weights, 0
+                        ) * self.dweight
+                return depdiff
+        else:
+            raise ValueError("Something went wrong")
+        self.distance_function = compute
 
     def get_distance(self, traini, testi):
-        return testi.get_distance(traini)
+        return self.distance_function(traini, testi)
 
     def get_class_label(self, slist):
         sublist =[ tr.category for tr in slist[0:self.k] ]
@@ -45,7 +88,6 @@ class KNNClassifier:
         start_time = time.clock()
         for test in testing_data:
             running_count += 1
-            ## IMPLEMENT DIST HERE
             sortkey = lambda tr: self.get_distance(test, tr)
             slist = sorted( training_data, key=sortkey )
             assigned_cat = self.get_class_label(slist)
@@ -56,7 +98,7 @@ class KNNClassifier:
                 correct_count += 1
             else:
                 failure_count += 1
-            if running_count % 25 == 0:
+            if running_count % 50 == 0:
                 remaining = self.calc_remaining_time(start_time, total_count, running_count)
                 logging.info("ETA %s %s: %s", test.category, test.instance, remaining)
 
@@ -76,13 +118,12 @@ class KNNClassifier:
         msg = "%s  %s" % (msg, "✓ " if assigned_cat == actual_cat else " ✗")
         print msg
 
-    def print_confusion_matrix(self):
-        f = open('confusion.csv', 'w')
+    def print_confusion_matrix(self, filename):
+        f = open(filename, 'w')
         firstrow = ''
         for heads in self.confusion_matrix.iterkeys():
             firstrow += ','
             firstrow += heads
-        #print firstrow
         f.write(firstrow)
         f.write('\n')
         for actual, pdict in self.confusion_matrix.iteritems():
@@ -90,7 +131,6 @@ class KNNClassifier:
             for predicted, value in pdict.iteritems():
                 currow += ','
                 currow += str(value)
-            #print currow
             f.write(currow)
             f.write('\n')
         f.close()

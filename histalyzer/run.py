@@ -5,7 +5,6 @@ import os
 import operator
 import random
 import logging
-import nearest_neighbor as nn
 import defs
 import util
 import argparse
@@ -88,7 +87,7 @@ def main():
     #PARAMETER SETUP:
     #frameset = defs.EVERY_5TH
     frameset = defs.EVERY_25TH
-    all_individuals = parse_data(weight_dict, used_metrics)
+    all_individuals = parse_data(used_metrics)
 
     if not SET_NOFILES:
         dir_raw, file_avg = create_directory_structure(frameset, used_metrics, neighbors, weights_color=weights_color, weights_depth=weights_depth)
@@ -97,7 +96,7 @@ def main():
     overall_tested = 0
     overall_correct = 0
     
-    classifier = KNNClassifier(neighbors, defs.ALL_CATEGORIES)
+    classifier = KNNClassifier(weight_dict, neighbors, defs.ALL_CATEGORIES)
 
     for category in categories:
         #CATEGORY VARIABLES:
@@ -122,7 +121,8 @@ def main():
             f = open("%s/category_%s.csv"% (dir_raw, category), "a")
             f.write('%s average,%s\n' % (category, average_aggregated))
             f.close()
-    classifier.print_confusion_matrix()
+    
+    classifier.print_confusion_matrix(dir_raw + '/confusion.csv')
 
     overall_percentage = float(overall_correct)/overall_tested * 100
     logging.info("Overall %% %f", overall_percentage)
@@ -134,7 +134,7 @@ def main():
     if SET_PRINTTOTAL:
         print "%f" %  overall_percentage
 
-def parse_data(weight_dict, metrics):
+def parse_data(metrics):
     script_dir = os.path.dirname(os.path.realpath(__file__))
     data_dir = script_dir + '/data'
     individuals = {}
@@ -143,8 +143,7 @@ def parse_data(weight_dict, metrics):
             logging.info("Skipping %s", data_file)
             continue
         data_file = data_dir + '/' + data_file
-        individuals = util.parse_file(data_file,
-                weights=weight_dict, dictionary=individuals)
+        individuals = util.parse_file(data_file, dictionary=individuals)
     return individuals
 
 def create_directory_structure(frameset, used_metrics, neighbors, weights_color=None, weights_depth=None):
