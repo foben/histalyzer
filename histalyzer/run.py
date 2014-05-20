@@ -13,7 +13,8 @@ from knnclassifier import KNNClassifier
 
 def main():
     #ARGUMENT PARSING:
-    known_metrics = ['da3', 'cr64', 'cg64', 'dd3', 'cb64', 'ccol', 'dd2', 'dd2_64']
+    known_metrics = ['cr64', 'cg64', 'cb64','ccol',\
+            'dd2', 'da3', 'dd3', 'dd2_64', 'da3_64']
     used_metrics = []
     parser = argparse.ArgumentParser(prog='Histalyzer')
     for m in known_metrics:
