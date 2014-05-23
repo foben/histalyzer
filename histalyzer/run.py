@@ -14,7 +14,7 @@ from knnclassifier import KNNClassifier
 def main():
     #ARGUMENT PARSING:
     known_metrics = ['cr64', 'cg64', 'cb64','ccol',\
-            'dd2', 'da3', 'dd3', 'dd2_64', 'da3_64']
+            'dd2', 'da3', 'dd3', 'dd2_64', 'da3_64', 'dd3_64']
     used_metrics = []
     parser = argparse.ArgumentParser(prog='Histalyzer')
     for m in known_metrics:
