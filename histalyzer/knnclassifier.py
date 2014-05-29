@@ -27,34 +27,34 @@ class KNNClassifier:
             self.sum_depth_weights = reduce(lsum, self.depth_weights, 0)
         self.sum_weights = self.cweight + self.dweight
 
-        assert (self.cweight > 0 or self.dweight > 0)
+        #self.dist_func = diff_sum
+        self.dist_func = diff_chi
 
-        lweight = lambda s, (m, w): s + w*histogram.diff_sum(self.histograms[m],
-                other_instance.histograms[m])
+        assert (self.cweight > 0 or self.dweight > 0)
 
         if self.cweight > 0 and self.dweight > 0:
             def compute(train, test):
                 coldiff = reduce(lambda s, (m,w): s +
-                        diff_sum(train.histograms[m], test.histograms[m])*w,
+                        self.dist_func(train.histograms[m], test.histograms[m])*w,
                         self.color_weights, 0
                         ) * self.cweight
 
                 depdiff = reduce(lambda s, (m,w): s +
-                        diff_sum(train.histograms[m], test.histograms[m])*w,
+                        self.dist_func(train.histograms[m], test.histograms[m])*w,
                         self.depth_weights, 0
                         ) * self.dweight
                 return (coldiff + depdiff) / self.sum_weights
         elif self.cweight > 0 and self.dweight == 0:
             def compute(train, test):
                 coldiff = reduce(lambda s, (m,w): s +
-                        diff_sum(train.histograms[m], test.histograms[m])*w,
+                        self.dist_func(train.histograms[m], test.histograms[m])*w,
                         self.color_weights, 0
                         )
                 return coldiff
         elif self.cweight == 0 and self.dweight > 0:
             def compute(train, test):
                 depdiff = reduce(lambda s, (m,w): s +
-                        diff_sum(train.histograms[m], test.histograms[m])*w,
+                        self.dist_func(train.histograms[m], test.histograms[m])*w,
                         self.depth_weights, 0
                         ) * self.dweight
                 return depdiff
