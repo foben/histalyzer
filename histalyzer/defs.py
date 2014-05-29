@@ -16,7 +16,7 @@ EVERY_25TH = (range(1, MAXFRAME, 25), "ev25th")
 EVERY_50TH = (range(1, MAXFRAME, 50), "ev50th")
 EVERY_100TH = (range(1, MAXFRAME, 100), "ev100th")
 EVERY_200TH = (range(1, MAXFRAME, 200), "ev200th")
-EVERY_300TH = (range(1, MAXFRAME, 300), "ev200th")
+EVERY_300TH = (range(1, MAXFRAME, 300), "ev300th")
 
 framesets = {
         5 : EVERY_5TH,
