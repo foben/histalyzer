@@ -10,10 +10,29 @@ RUN12 = RUN1 + RUN2
 RUN34 = RUN3 + RUN4
 
 EVERY_5TH = (range(1, MAXFRAME, 5), "ev5th")
+EVERY_10TH = (range(1, MAXFRAME, 10), "ev5th")
 EVERY_15TH = (range(1, MAXFRAME, 15), "ev15th")
 EVERY_25TH = (range(1, MAXFRAME, 25), "ev25th")
+EVERY_50TH = (range(1, MAXFRAME, 50), "ev25th")
 EVERY_100TH = (range(1, MAXFRAME, 100), "ev100th")
 EVERY_200TH = (range(1, MAXFRAME, 200), "ev200th")
 EVERY_300TH = (range(1, MAXFRAME, 300), "ev200th")
 
+framesets = {
+        5 : EVERY_5TH,
+        10: EVERY_10TH,
+        15: EVERY_15TH,
+        25: EVERY_25TH,
+        50: EVERY_50TH,
+        100: EVERY_100TH,
+        200: EVERY_200TH,
+        300: EVERY_300TH
+        }
+
+def get_frameset(n):
+    return framesets[n]
+
 DATA_DIR = __file__
+
+
+

@@ -28,11 +28,13 @@ def main():
     parser.add_argument('--no_files', action='store_true')
     parser.add_argument('--print_total', action='store_true')
     parser.add_argument('categories', nargs='+')
+    parser.add_argument('--every', type=int, default=25)
     parsed =  parser.parse_args()
     SET_NOFILES = parsed.no_files
     SET_PRINTTOTAL = parsed.print_total
     SET_QUIET = parsed.quiet
     SET_DEBUG = parsed.debug
+    SET_EVERY = parsed.every
     if SET_QUIET:
         logging.basicConfig(level=logging.WARN)
     elif SET_DEBUG:
@@ -88,7 +90,8 @@ def main():
 
     #PARAMETER SETUP:
     #frameset = defs.EVERY_5TH
-    frameset = defs.EVERY_25TH
+    #frameset = defs.EVERY_25TH
+    frameset = defs.get_frameset(SET_EVERY)
     all_individuals = parse_data(used_metrics)
 
     if not SET_NOFILES:
