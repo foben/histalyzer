@@ -27,8 +27,10 @@ class KNNClassifier:
             self.sum_depth_weights = reduce(lsum, self.depth_weights, 0)
         self.sum_weights = self.cweight + self.dweight
 
-        self.dist_func = diff_sum
+        #self.dist_func = diff_sum
         #self.dist_func = diff_chi
+        self.qf = QuadraticForm(10)
+        self.dist_func = self.qf.get_distance
 
         assert (self.cweight > 0 or self.dweight > 0)
 

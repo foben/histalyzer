@@ -1,4 +1,9 @@
 import math
+#import numpypy
+#import numpy as np
+from numpy import matrix
+#from numpy import matrix
+from simil_matrix import get_simil_matrix
 
 class Histogram:
     def __init__(self, htype, data):
@@ -36,4 +41,24 @@ def diff_chi(hist1, hist2):
         distance += ((a-b)**2)/divid
     distance *= 0.5
     return distance
+
+class QuadraticForm:
+    def __init__(self, bincount):
+        self.A = get_simil_matrix(bincount)
+
+    def get_distance(self, h1, h2):
+        h1 = matrix(h1.data)
+        h2 = matrix(h2.data)
+        diff = h1 - h2
+        dist = math.sqrt(float(diff*self.A*diff.T))
+        if dist < 0:
+            dist = 0
+            print "DISTANCE WAS SMALLER 0!"
+        return dist
+
+
+
+
+
+
 
