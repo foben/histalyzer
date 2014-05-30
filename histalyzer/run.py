@@ -8,6 +8,7 @@ import logging
 import defs
 import util
 import argparse
+from parse_arguments import parse_categories
 from histogram import *
 from knnclassifier import KNNClassifier
 
@@ -41,27 +42,7 @@ def main():
         logging.basicConfig(level=logging.DEBUG)
     else:
         logging.basicConfig(level=logging.INFO)
-    if len(parsed.categories) == 1:
-        if parsed.categories[0] == 'all':
-            categories = defs.ALL_CATEGORIES
-        elif parsed.categories[0] == 'run1':
-            categories = defs.RUN1
-        elif parsed.categories[0] == 'run2':
-            categories = defs.RUN2
-        elif parsed.categories[0] == 'run3':
-            categories = defs.RUN3
-        elif parsed.categories[0] == 'run4':
-            categories = defs.RUN4
-        elif parsed.categories[0] == 'run12':
-            categories = defs.RUN12
-        elif parsed.categories[0] == 'run34':
-            categories = defs.RUN34
-        else:
-            categories = parsed.categories
-        categories_string = parsed.categories[0]
-    else:
-        categories = parsed.categories
-        categories_string = '_'.join(categories)
+    categories, SET_PARTIAL = parse_categories(parsed.categories)
     weight_color = parsed.wcolor
     weights_color = []
     weight_depth = parsed.wdepth
@@ -95,7 +76,8 @@ def main():
     all_individuals = parse_data(used_metrics)
 
     if not SET_NOFILES:
-        dir_raw, file_avg = create_directory_structure(frameset, used_metrics, neighbors, weights_color=weights_color, weights_depth=weights_depth)
+        dir_top, dir_raw = create_directory_structure(frameset, used_metrics, neighbors,
+                partial=SET_PARTIAL, weights_color=weights_color, weights_depth=weights_depth)
 
     #OVERALL VARIABLES:
     overall_tested = 0
@@ -127,14 +109,10 @@ def main():
             f.write('%s average,%s\n' % (category, average_aggregated))
             f.close()
     
-    classifier.print_confusion_matrix(dir_raw + '/confusion.csv')
+    classifier.print_confusion_matrix(dir_top + '/confusion.csv')
 
     overall_percentage = float(overall_correct)/overall_tested * 100
     logging.info("Overall %% %f", overall_percentage)
-    if not SET_NOFILES:
-        f = open(file_avg, "a")
-        f.write('overall_%s,%s,%s\n' % (categories_string, overall_tested, overall_correct))
-        f.close()
 
     if SET_PRINTTOTAL:
         print "%f" %  overall_percentage
@@ -151,7 +129,8 @@ def parse_data(metrics):
         individuals = util.parse_file(data_file, dictionary=individuals)
     return individuals
 
-def create_directory_structure(frameset, used_metrics, neighbors, weights_color=None, weights_depth=None):
+def create_directory_structure(frameset, used_metrics, neighbors, partial=None,
+        weights_color=None, weights_depth=None):
     topdir = frameset[1]
     la_weightsdir = lambda st, (m, w): st + '%s-%s_' % (w, m)
     metricdir = ''
@@ -160,16 +139,13 @@ def create_directory_structure(frameset, used_metrics, neighbors, weights_color=
     metricdir = metricdir[0:-1]
     nndir = "%snn" % neighbors
 
-    dirstring = '_'.join([topdir, nndir]) 
-    dirstring = '/'.join([dirstring, metricdir])
-    avgfile = dirstring + '/averages.csv'
-    dirstring += '/raw'
-    if not os.path.exists(dirstring):
-        os.makedirs(dirstring)
-
-    f = open(avgfile, 'a')
-    f.write('category,%s_%s_%s\n' % (nndir, metricdir, topdir))
-    f.close()
-    return dirstring, avgfile
+    topdir = '_'.join([topdir, nndir]) 
+    if partial:
+        topdir += partial
+    topdir = '/'.join([topdir, metricdir])
+    raw_dir = topdir + '/raw'
+    if not os.path.exists(raw_dir):
+        os.makedirs(raw_dir)
+    return topdir, raw_dir
 
 main()
