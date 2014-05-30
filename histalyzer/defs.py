@@ -1,8 +1,8 @@
 MAXFRAME = 331
 
 ALL_CATEGORIES = ['apple','ball','banana','bell-pepper','binder','bowl','calculator','camera','cap','cell-phone','cereal-box','coffee-mug','comb','dry-battery','flashlight','food-bag','food-box','food-can','food-cup','food-jar','garlic','glue-stick','greens','hand-towel','instant-noodles','keyboard','kleenex','lemon','lightbulb','lime','marker','mushroom','notebook','onion','orange','peach','pear','pitcher','plate','pliers','potato','rubber-eraser','scissors','shampoo','soda-can','sponge','stapler','tomato','toothbrush','toothpaste','water-bottle'] 
-RUN1 = ['apple','ball','banana','bell-pepper','binder','bowl','calculator','camera','cap','cell-phone','cereal-box','coffee-mug','comb','dry-battery','flashlight']
-RUN2 = ['food-bag','food-box','food-can','food-cup','food-jar','garlic','glue-stick','greens','hand-towel','instant-noodles']
+RUN1 = ['apple','ball','banana','bell-pepper','binder','bowl','calculator','camera','cap','cell-phone','cereal-box','coffee-mug','comb','dry-battery','flashlight','food-bag']
+RUN2 = ['food-box','food-can','food-cup','food-jar','garlic','glue-stick','greens','hand-towel','instant-noodles']
 RUN3 = ['keyboard','kleenex','lemon','lightbulb','lime','marker','mushroom','notebook','onion','orange','peach','pear','pitcher','plate']
 RUN4 = ['pliers','potato','rubber-eraser','scissors','shampoo','soda-can','sponge','stapler','tomato','toothbrush','toothpaste','water-bottle']
 
@@ -11,14 +11,14 @@ RUN34 = RUN3 + RUN4
 
 
 
-RUN81 = ['apple','ball','banana','bell-pepper','binder','bowl']
-RUN82 = ['calculator','camera','cap','cell-phone','cereal-box','coffee-mug']
-RUN83 = ['comb','dry-battery','flashlight','food-bag','food-box','food-can']
-RUN84 = ['food-cup','food-jar','garlic','glue-stick','greens','hand-towel']
-RUN85 = ['instant-noodles','keyboard','kleenex','lemon','lightbulb','lime','marker']
-RUN86 = ['mushroom','notebook','onion','orange','peach','pear']
-RUN87 = ['pitcher','plate','pliers','potato','rubber-eraser','scissors','shampoo',]
-RUN88 = ['soda-can','sponge','stapler','tomato','toothbrush','toothpaste','water-bottle']
+RUN81 = ['apple','ball','banana','bell-pepper','binder','bowl','calculator','camera']
+RUN82 = ['cap','cell-phone','cereal-box','coffee-mug','comb','dry-battery','flashlight','food-bag']
+RUN83 = ['food-box','food-can','food-cup']
+RUN84 = ['food-jar','garlic','glue-stick','greens','hand-towel','instant-noodles']
+RUN85 = ['keyboard','kleenex','lemon','lightbulb','lime','marker','mushroom']
+RUN86 = ['notebook','onion','orange','peach','pear','pitcher','plate']
+RUN87 = ['pliers','potato','rubber-eraser','scissors','shampoo','soda-can','sponge']
+RUN88 = ['stapler','tomato','toothbrush','toothpaste','water-bottle']
 
 
 ALL_FRAMES = (range(1, MAXFRAME), "allFrames")
