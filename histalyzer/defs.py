@@ -22,6 +22,7 @@ RUN88 = ['stapler','tomato','toothbrush','toothpaste','water-bottle']
 
 
 ALL_FRAMES = (range(1, MAXFRAME), "allFrames")
+EVERY_2ND = (range(1, MAXFRAME, 2), "ev2nd")
 EVERY_5TH = (range(1, MAXFRAME, 5), "ev5th")
 EVERY_10TH = (range(1, MAXFRAME, 10), "ev10th")
 EVERY_15TH = (range(1, MAXFRAME, 15), "ev15th")
@@ -34,6 +35,7 @@ EVERY_400TH = (range(1, MAXFRAME, 400), "ev400th")
 
 framesets = {
         1 : ALL_FRAMES,
+        2 : EVERY_2ND,
         5 : EVERY_5TH,
         10: EVERY_10TH,
         15: EVERY_15TH,
