@@ -33,6 +33,8 @@ EVERY_100TH = (range(1, MAXFRAME, 100), "ev100th")
 EVERY_200TH = (range(1, MAXFRAME, 200), "ev200th")
 EVERY_300TH = (range(1, MAXFRAME, 300), "ev300th")
 EVERY_400TH = (range(1, MAXFRAME, 400), "ev400th")
+EVERY_500TH = (range(1, MAXFRAME, 500), "ev500th")
+EVERY_600TH = (range(1, MAXFRAME, 600), "ev600th")
 
 framesets = {
         1 : ALL_FRAMES,
@@ -46,7 +48,9 @@ framesets = {
         100: EVERY_100TH,
         200: EVERY_200TH,
         300: EVERY_300TH,
-        400: EVERY_400TH
+        400: EVERY_400TH,
+        500: EVERY_500TH,
+        600: EVERY_600TH
         }
 
 def get_frameset(n):

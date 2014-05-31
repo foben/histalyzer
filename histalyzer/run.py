@@ -27,15 +27,15 @@ def main():
     parser.add_argument('--quiet', action='store_true')
     parser.add_argument('--debug', action='store_true')
     parser.add_argument('--no_files', action='store_true')
-    parser.add_argument('--print_total', action='store_true')
+    parser.add_argument('--scores', action='store_true')
     parser.add_argument('categories', nargs='+')
     parser.add_argument('--every', type=int, default=25)
     parsed =  parser.parse_args()
     SET_NOFILES = parsed.no_files
-    SET_PRINTTOTAL = parsed.print_total
     SET_QUIET = parsed.quiet
     SET_DEBUG = parsed.debug
     SET_EVERY = parsed.every
+    SET_SCORES = parsed.scores
     if SET_QUIET:
         logging.basicConfig(level=logging.WARN)
     elif SET_DEBUG:
@@ -109,13 +109,15 @@ def main():
             f.write('%s average,%s\n' % (category, average_aggregated))
             f.close()
     
-    classifier.print_confusion_matrix(dir_top + '/confusion.csv')
+    if not SET_NOFILES:
+        classifier.print_confusion_matrix(dir_top + '/confusion.csv')
+
+    if SET_SCORES:
+        print classifier.get_overall_scores()
 
     overall_percentage = float(overall_correct)/overall_tested * 100
     logging.info("Overall %% %f", overall_percentage)
 
-    if SET_PRINTTOTAL:
-        print "%f" %  overall_percentage
 
 def parse_data(metrics):
     script_dir = os.path.dirname(os.path.realpath(__file__))
@@ -132,7 +134,7 @@ def parse_data(metrics):
 def create_directory_structure(frameset, used_metrics, neighbors, partial=None,
         weights_color=None, weights_depth=None):
     topdir = frameset[1]
-    la_weightsdir = lambda st, (m, w): st + '%s-%s_' % (w, m)
+    la_weightsdir = lambda st, (m, w): st + '%s-%s_' % (m, w)
     metricdir = ''
     metricdir = reduce(la_weightsdir, weights_depth, metricdir)
     metricdir = reduce(la_weightsdir, weights_color, metricdir)

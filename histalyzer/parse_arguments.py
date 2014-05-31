@@ -1,3 +1,4 @@
+import logging
 from defs import *
 
 def parse_categories(categorylist):
@@ -16,7 +17,8 @@ def parse_categories(categorylist):
     else:
         categories = categorylist
         SET_PARTIAL = '_' + '_'.join(categories)
-    print "Cats: {} \n SET_PARTIAL: {}".format(categories, SET_PARTIAL)
+    logging.info("Testing Categories: {}".format(categories))
+    logging.info("SET_PARTIAL: {}".format(SET_PARTIAL))
     return categories, SET_PARTIAL
 
 runmap = {

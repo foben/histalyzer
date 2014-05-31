@@ -15,6 +15,7 @@ class KNNClassifier:
         self.confusion_matrix = OrderedDict([ (actual,
             OrderedDict([ (predicted,0) for predicted in classes] ))
             for actual in classes ])
+        self.classes = classes
         self.cweight = weights['color'][0]
         self.dweight = weights['depth'][0]
 
@@ -137,3 +138,63 @@ class KNNClassifier:
             f.write('\n')
         f.close()
 
+    def get_TP(self, cat):
+        return self.confusion_matrix[cat][cat]
+
+    def get_FP(self, cat):
+        fp = 0
+        for act, pred in self.confusion_matrix.iteritems():
+            fp += pred[cat]
+        fp -= self.get_TP(cat)
+        return fp
+
+    def get_FN(self, cat):
+        fn = reduce(lambda s, x: s+x,
+                [v for k, v in self.confusion_matrix[cat].iteritems() if k != cat])
+        return fn
+
+    def get_TN(self, cat):
+        return self.get_total_classified() - \
+           self.get_TP(cat) - self.get_FP(cat) - self.get_FN(cat)
+
+    def get_precision(self, cat):
+        tp = float(self.get_TP(cat))
+        fp = float(self.get_FP(cat))
+        try:
+            return tp / (tp + fp)
+        except ZeroDivisionError:
+            return 0
+
+    def get_recall(self, cat):
+        tp = float(self.get_TP(cat))
+        fn = float(self.get_FN(cat))
+        try: 
+            return tp / (tp + fn)
+        except ZeroDivisionError:
+            return 0
+
+    def get_fone(self, cat):
+        pr = self.get_precision(cat)
+        rc = self.get_recall(cat)
+        try:
+            return (2*pr*rc)/(pr+rc)
+        except ZeroDivisionError:
+            return 0
+
+    def get_overall_scores(self):
+        pr = reduce(lambda s, x: s+x,
+                [ self.get_precision(clazz) for clazz in self.classes]
+                )/ float(len(self.classes))
+        rc = reduce(lambda s, x: s+x,
+                [ self.get_recall(clazz) for clazz in self.classes]
+                )/ float(len(self.classes))
+        fone = (2*pr*rc)/(pr+rc)
+        return pr, rc, fone
+
+    
+    def get_total_classified(self):
+        return reduce(lambda s, x: s+x,
+                [self.confusion_matrix[act][pred]
+                    for act in self.confusion_matrix.iterkeys()
+                    for pred in self.confusion_matrix[act].iterkeys()
+                    ])
