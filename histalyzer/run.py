@@ -113,7 +113,8 @@ def main():
         classifier.print_confusion_matrix(dir_top + '/confusion.csv')
 
     if SET_SCORES:
-        print classifier.get_overall_scores()
+        scrs = classifier.get_overall_scores()
+        print "{},{},{}".format(scrs[0], scrs[1], scrs[2])
 
     overall_percentage = float(overall_correct)/overall_tested * 100
     logging.info("Overall %% %f", overall_percentage)
