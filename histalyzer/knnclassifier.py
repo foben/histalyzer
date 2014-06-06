@@ -6,7 +6,7 @@ import time
 import datetime
 import logging
 #import threading
-from multiprocessing import Process, Lock
+from multiprocessing import Process, Lock, Queue
 from histogram import *
 from collections import Counter, OrderedDict
 from random import randint
@@ -88,18 +88,27 @@ class KNNClassifier:
         return maxcat
 
     def perform_classification(self, training_data, testing_data):
+        logging.info("Starting {}".format(testing_data[0].category))
         thrds = []
-        plength = len(testing_data)/8 + 1
-        start_time = time.clock()
+        plength = len(testing_data)/4 + 1
+        q = Queue()
+        strt = time.time()
         for lit in chunks(testing_data, plength):
-            t = Classifthread(training_data, lit, self)
+            t = Process(target=mproc, args=(training_data, lit, self,q,))
             t.start()
             thrds.append(t)
         for t in thrds:
             t.join()
+        q.put('DONE')
+        while True:
+            item = q.get()
+            if item == 'DONE':
+                break
+            self.confusion_matrix[item[0]][item[1]] += 1
         
-        logging.info("Instance took {}".format(datetime.timedelta(
-            seconds=int(time.clock() - start_time))))
+        end = time.time()
+        delt = datetime.timedelta(seconds=int(end - strt))
+        logging.info("Instance took {}".format(delt))
         return 0, 0, 0
 
     def add_to_cm(self, actual, assigned):
@@ -181,7 +190,6 @@ class KNNClassifier:
             return 0
 
     def get_overall_scores(self):
-	print self.number
         pr = reduce(lambda s, x: s+x,
                 [ self.get_precision(clazz) for clazz in self.classes]
                 )/ float(len(self.classes))
@@ -199,20 +207,14 @@ class KNNClassifier:
                     for pred in self.confusion_matrix[act].iterkeys()
                     ])
 
-class Classifthread(Process):
-    def __init__(self, training_data, testing_data, classif):
-        Process.__init__(self)
-        self.trdata = training_data
-        self.testdata = testing_data
-        self.classif = classif
-    
-    def run(self):
-        for test in self.testdata:
-            sortkey = lambda tr: self.classif.get_distance(test, tr)
-            slist = sorted( self.trdata, key=sortkey )
-            assigned_cat = self.classif.get_class_label(slist)
-            actual_cat = test.category
-            self.classif.add_to_cm(self.classif, actual_cat, assigned_cat)
+def mproc(trdata, testdata, classif, queue):
+    for test in testdata:
+        sortkey = lambda tr: classif.get_distance(test, tr)
+        slist = sorted( trdata, key=sortkey )
+        assigned_cat = classif.get_class_label(slist)
+        actual_cat = test.category
+        queue.put((actual_cat, assigned_cat))
+    queue.close()
 
 def chunks(l, n):
     for i in xrange(0, len(l), n):

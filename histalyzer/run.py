@@ -70,8 +70,6 @@ def main():
     weight_dict['depth'] = ( weight_depth , weights_depth )
 
     #PARAMETER SETUP:
-    #frameset = defs.EVERY_5TH
-    #frameset = defs.EVERY_25TH
     frameset = defs.get_frameset(SET_EVERY)
     all_individuals = parse_data(used_metrics)
 
@@ -80,15 +78,8 @@ def main():
                 partial=SET_PARTIAL, weights_color=weights_color, weights_depth=weights_depth)
 
     #OVERALL VARIABLES:
-    overall_tested = 0
-    overall_correct = 0
-    
     classifier = KNNClassifier(weight_dict, neighbors, defs.ALL_CATEGORIES)
-
     for category in categories:
-        #CATEGORY VARIABLES:
-        category_tested = 0
-        category_correct = 0
 
         for instance in all_individuals[category]:
             traindata, testdata = util.get_datasets(category, instance, all_individuals, frameset[0])
