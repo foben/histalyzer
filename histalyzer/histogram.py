@@ -1,7 +1,7 @@
 import math
 #import numpypy
 #import numpy as np
-from numpy import matrix
+#from numpy import matrix
 #from numpy import matrix
 from simil_matrix import get_simil_matrix
 

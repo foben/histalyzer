@@ -86,7 +86,7 @@ class KNNClassifier:
 
     def perform_classification(self, training_data, testing_data):
         thrds = []
-        plength = len(testing_data)/1 + 1
+        plength = len(testing_data)/8 + 1
         start_time = time.clock()
         for lit in chunks(testing_data, plength):
             t = Classifthread(training_data, lit, self)

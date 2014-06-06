@@ -1,6 +1,6 @@
 import sys
 import math
-import numpy as np
+#import numpy as np
 
 m = 0
 sig = 12

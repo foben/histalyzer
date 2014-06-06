@@ -1,6 +1,7 @@
 *.pyc
 *.swp
 *.csv
+*.class
 data
 learner.sh
 other
