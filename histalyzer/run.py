@@ -93,32 +93,14 @@ def main():
         for instance in all_individuals[category]:
             traindata, testdata = util.get_datasets(category, instance, all_individuals, frameset[0])
             #result, instance_tested, instance_correct = nn.nearest_neighbor(traindata, testdata, neighbors)
-            result, instance_tested, instance_correct = classifier.perform_classification(traindata, testdata)
-            category_tested += instance_tested
-            overall_tested += instance_tested
-            category_correct += instance_correct
-            overall_correct += instance_correct
-            if not SET_NOFILES:
-                f = open("%s/category_%s.csv" % (dir_raw, category), "a")
-                f.write('%s %s,%s\n' % (category, instance, result))
-                f.close()
+            classifier.perform_classification(traindata, testdata)
 
-        average_aggregated = float(category_correct) / category_tested * 100
-        if not SET_NOFILES:
-            f = open("%s/category_%s.csv"% (dir_raw, category), "a")
-            f.write('%s average,%s\n' % (category, average_aggregated))
-            f.close()
-    
     if not SET_NOFILES:
         classifier.print_confusion_matrix(dir_top + '/confusion.csv')
 
     if SET_SCORES:
         scrs = classifier.get_overall_scores()
         print "{},{},{}".format(scrs[0], scrs[1], scrs[2])
-
-    overall_percentage = float(overall_correct)/overall_tested * 100
-    logging.info("Overall %% %f", overall_percentage)
-
 
 def parse_data(metrics):
     script_dir = os.path.dirname(os.path.realpath(__file__))

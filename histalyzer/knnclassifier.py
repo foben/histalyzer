@@ -5,6 +5,7 @@ import operator
 import time
 import datetime
 import logging
+import threading
 from histogram import *
 from collections import Counter, OrderedDict
 
@@ -18,6 +19,7 @@ class KNNClassifier:
         self.classes = classes
         self.cweight = weights['color'][0]
         self.dweight = weights['depth'][0]
+        self.conflock = threading.Lock()
 
         lsum = lambda s, (m, w): s + w
         if self.cweight:
@@ -83,30 +85,24 @@ class KNNClassifier:
         return maxcat
 
     def perform_classification(self, training_data, testing_data):
-        total_count = len(testing_data) 
-        running_count = 0
-        failure_count = 0
-        correct_count = 0
-
+        thrds = []
+        plength = len(testing_data)/1 + 1
         start_time = time.clock()
-        for test in testing_data:
-            running_count += 1
-            sortkey = lambda tr: self.get_distance(test, tr)
-            slist = sorted( training_data, key=sortkey )
-            assigned_cat = self.get_class_label(slist)
-            actual_cat = test.category
-            self.confusion_matrix[actual_cat][assigned_cat] += 1
-            marker = ""
-            if (assigned_cat == actual_cat):
-                correct_count += 1
-            else:
-                failure_count += 1
-            if running_count % 50 == 0:
-                remaining = self.calc_remaining_time(start_time, total_count, running_count)
-                logging.info("ETA %s %s: %s", test.category, test.instance, remaining)
+        for lit in chunks(testing_data, plength):
+            t = Classifthread(training_data, lit, self)
+            t.start()
+            thrds.append(t)
+        for t in thrds:
+            t.join()
+        
+        logging.info("Instance took {}".format(datetime.timedelta(
+            seconds=int(time.clock() - start_time))))
+        return 0, 0, 0
 
-        correct_percentage = float(correct_count)/ total_count * 100
-        return correct_percentage, total_count, correct_count
+    def add_to_cm(self, actual, assigned):
+        self.conflock.acquire()
+        self.confusion_matrix[actual][assigned] += 1
+        self.conflock.release()
 
     def calc_remaining_time(self, start, total, current):
         percentage = float(current) / total
@@ -198,3 +194,23 @@ class KNNClassifier:
                     for act in self.confusion_matrix.iterkeys()
                     for pred in self.confusion_matrix[act].iterkeys()
                     ])
+
+class Classifthread(threading.Thread):
+    def __init__(self, training_data, testing_data, classif):
+        threading.Thread.__init__(self)
+        self.trdata = training_data
+        self.testdata = testing_data
+        self.classif = classif
+    
+    def run(self):
+        for test in self.testdata:
+            sortkey = lambda tr: self.classif.get_distance(test, tr)
+            slist = sorted( self.trdata, key=sortkey )
+            assigned_cat = self.classif.get_class_label(slist)
+            actual_cat = test.category
+            self.classif.add_to_cm(actual_cat, assigned_cat)
+
+
+def chunks(l, n):
+    for i in xrange(0, len(l), n):
+        yield l[i:i+n]
