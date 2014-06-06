@@ -5,7 +5,8 @@ import operator
 import time
 import datetime
 import logging
-import threading
+#import threading
+from multiprocessing import Process, Lock
 from histogram import *
 from collections import Counter, OrderedDict
 
@@ -19,7 +20,7 @@ class KNNClassifier:
         self.classes = classes
         self.cweight = weights['color'][0]
         self.dweight = weights['depth'][0]
-        self.conflock = threading.Lock()
+        self.conflock = Lock()
 
         lsum = lambda s, (m, w): s + w
         if self.cweight:
@@ -86,7 +87,7 @@ class KNNClassifier:
 
     def perform_classification(self, training_data, testing_data):
         thrds = []
-        plength = len(testing_data)/8 + 1
+        plength = len(testing_data)/2 + 1
         start_time = time.clock()
         for lit in chunks(testing_data, plength):
             t = Classifthread(training_data, lit, self)
@@ -195,9 +196,9 @@ class KNNClassifier:
                     for pred in self.confusion_matrix[act].iterkeys()
                     ])
 
-class Classifthread(threading.Thread):
+class Classifthread(Process):
     def __init__(self, training_data, testing_data, classif):
-        threading.Thread.__init__(self)
+        Process.__init__(self)
         self.trdata = training_data
         self.testdata = testing_data
         self.classif = classif
