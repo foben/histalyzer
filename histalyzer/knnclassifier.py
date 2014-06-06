@@ -9,6 +9,7 @@ import logging
 from multiprocessing import Process, Lock
 from histogram import *
 from collections import Counter, OrderedDict
+from random import randint
 
 class KNNClassifier:
 
@@ -21,6 +22,7 @@ class KNNClassifier:
         self.cweight = weights['color'][0]
         self.dweight = weights['depth'][0]
         self.conflock = Lock()
+	self.number = randint(1,5000)
 
         lsum = lambda s, (m, w): s + w
         if self.cweight:
@@ -87,7 +89,7 @@ class KNNClassifier:
 
     def perform_classification(self, training_data, testing_data):
         thrds = []
-        plength = len(testing_data)/2 + 1
+        plength = len(testing_data)/8 + 1
         start_time = time.clock()
         for lit in chunks(testing_data, plength):
             t = Classifthread(training_data, lit, self)
@@ -179,6 +181,7 @@ class KNNClassifier:
             return 0
 
     def get_overall_scores(self):
+	print self.number
         pr = reduce(lambda s, x: s+x,
                 [ self.get_precision(clazz) for clazz in self.classes]
                 )/ float(len(self.classes))
@@ -209,8 +212,7 @@ class Classifthread(Process):
             slist = sorted( self.trdata, key=sortkey )
             assigned_cat = self.classif.get_class_label(slist)
             actual_cat = test.category
-            self.classif.add_to_cm(actual_cat, assigned_cat)
-
+            self.classif.add_to_cm(self.classif, actual_cat, assigned_cat)
 
 def chunks(l, n):
     for i in xrange(0, len(l), n):
