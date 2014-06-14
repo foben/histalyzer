@@ -110,7 +110,7 @@ def parse_data(metrics):
 
 def create_directory_structure(frameset, used_metrics, neighbors, partial=None,
         weights_color=None, weights_depth=None):
-    topdir = frameset[1]
+    topdir = frameset[1] + '_video'
     la_weightsdir = lambda st, (m, w): st + '%s-%s_' % (m, w)
     metricdir = ''
     metricdir = reduce(la_weightsdir, weights_depth, metricdir)
