@@ -11,6 +11,7 @@ import argparse
 from parse_arguments import parse_categories
 from histogram import *
 from knnclassifier import KNNClassifier
+from video_knnclassifier import VideoKNNClassifier
 
 def main():
     #ARGUMENT PARSING:
@@ -79,10 +80,12 @@ def main():
 
     #OVERALL VARIABLES:
     classifier = KNNClassifier(weight_dict, neighbors, defs.ALL_CATEGORIES)
+    classifier = VideoKNNClassifier(weight_dict, neighbors, defs.ALL_CATEGORIES)
     for category in categories:
 
         for instance in all_individuals[category]:
-            traindata, testdata = util.get_datasets(category, instance, all_individuals, frameset[0])
+            #traindata, testdata = util.get_datasets(category, instance, all_individuals, frameset[0])
+            traindata, testdata = util.get_video_datasets(category, instance, all_individuals, frameset[0])
             #result, instance_tested, instance_correct = nn.nearest_neighbor(traindata, testdata, neighbors)
             classifier.perform_classification(traindata, testdata)
 

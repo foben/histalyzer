@@ -14,7 +14,7 @@ class Individual:
         self.histograms[metric] = histogram;
 
     def __repr__(self):
-        return '[|' + self.name + '|]'
+        return '|' + self.name + '|'
 
     def __eq__(self, obj):
         if not isinstance(obj, Individual):

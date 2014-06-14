@@ -94,3 +94,32 @@ def get_datasets(for_category, for_instance, input_data, tr_frames=None):
         for f in input_data[c][i][v].keys()
             if (all_frames_for_training or f in tr_frames)]
     return traindata, testdata
+
+def get_video_datasets(for_category, for_instance, input_data, tr_frames=None):
+    all_frames_for_training = True if not tr_frames else False
+
+    ##Construct list of video-sequence frames:
+    seqlist = []
+    for frlist in [xrange(1,26), xrange(26,51), xrange(51,76), xrange(76,101)]:
+        for view in [1, 2, 4]:
+            clist = []
+            for frame in frlist:
+                try:
+                    clist.append(input_data[for_category][for_instance][view][frame])
+                except KeyError as ke:
+                    pass
+                    #print "{} {} failed with: {}".format(for_category, for_instance, ke.args)
+            if len(clist) < 15:
+                continue
+            seqlist.append(sorted(clist, key=lambda ind: ind.frame))
+
+    #Use only chosen frames for training.
+    #Discard any frames from the instance to test.
+    traindata = [ input_data[c][i][v][f] \
+        for c in input_data.keys() \
+        for i in input_data[c].keys() \
+            if (c != for_category or (c == for_category and i != for_instance))
+        for v in input_data[c][i].keys() \
+        for f in input_data[c][i][v].keys()
+            if (all_frames_for_training or f in tr_frames)]
+    return traindata, seqlist
