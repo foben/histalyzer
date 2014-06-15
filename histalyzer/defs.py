@@ -21,6 +21,24 @@ RUN87 = ['pliers','potato','rubber-eraser','scissors','shampoo','soda-can','spon
 RUN88 = ['stapler','tomato','toothbrush','toothpaste','water-bottle']
 
 
+
+RUN161 = ['apple','ball','banana','bell-pepper']
+RUN162 = ['binder','bowl','calculator','camera']
+RUN163 = ['cap','cell-phone','cereal-box','coffee-mug']
+RUN164 = ['comb','dry-battery','flashlight','food-bag']
+RUN165 = ['food-can']
+RUN166 = ['food-box','food-cup']
+RUN167 = ['food-jar','garlic','glue-stick']
+RUN168 = ['greens','hand-towel','instant-noodles']
+RUN169 = ['keyboard','kleenex','lemon']
+RUN1610= ['lightbulb','lime','marker','mushroom']
+RUN1611 = ['notebook','onion','orange']
+RUN1612 = ['peach','pear','pitcher','plate']
+RUN1613 = ['pliers','potato','rubber-eraser','scissors']
+RUN1614 = ['shampoo','soda-can','sponge']
+RUN1615 = ['stapler','tomato']
+RUN1616 = ['toothbrush','toothpaste','water-bottle']
+
 ALL_FRAMES = (range(1, MAXFRAME), "allFrames")
 EVERY_2ND = (range(1, MAXFRAME, 2), "ev2nd")
 EVERY_3RD = (range(1, MAXFRAME, 3), "ev3rd")
